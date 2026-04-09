@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Daily Jira worklog → Gmail (SMTP).
+
+  1. Copy to ~/Library/LaunchAgents/com.yourname.worklog-gmail.plist
+  2. Edit ProgramArguments: absolute path to send_worklog_to_gmail.py
+  3. Set Hour / Minute (24h, local timezone).
+  4. Put JIRA_* and GMAIL_* + WORKLOG_EMAIL_TO in ~/.cursor/credentials.env
+  5. load:   launchctl load ~/Library/LaunchAgents/com.yourname.worklog-gmail.plist
+     unload: launchctl unload ~/Library/LaunchAgents/com.yourname.worklog-gmail.plist
+
+  Test:
+    python3 ~/dev/jira-worklog-slack/scripts/send_worklog_to_gmail.py --days 1 -z Asia/Kolkata
+-->
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.yourname.worklog-gmail</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/usr/bin/python3</string>
+    <string>/ABS/PATH/TO/jira-worklog-slack/scripts/send_worklog_to_gmail.py</string>
+    <string>--days</string>
+    <string>1</string>
+    <string>-z</string>
+    <string>Asia/Kolkata</string>
+  </array>
+  <key>StartCalendarInterval</key>
+  <dict>
+    <key>Hour</key>
+    <integer>18</integer>
+    <key>Minute</key>
+    <integer>30</integer>
+  </dict>
+  <key>StandardOutPath</key>
+  <string>/tmp/worklog-gmail.out.log</string>
+  <key>StandardErrorPath</key>
+  <string>/tmp/worklog-gmail.err.log</string>
+</dict>
+</plist>

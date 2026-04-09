@@ -1,0 +1,46 @@
+# Daily Jira worklog summary → Gmail (SMTP + App Password).
+#
+# Repo Settings → Secrets and variables → Actions:
+#   JIRA_SITE_URL
+#   JIRA_USER_EMAIL
+#   JIRA_API_TOKEN
+#   GMAIL_SMTP_USER      — sender@gmail.com
+#   GMAIL_SMTP_PASSWORD  — 16-char App Password (no spaces or with spaces)
+#   WORKLOG_EMAIL_TO     — optional; defaults to GMAIL_SMTP_USER
+# Optional:
+#   WORKLOG_EMAIL_SUBJECT
+#   REQUEST_VERIFY_SSL
+#
+# Cron is UTC only. Convert local time: https://crontab.guru/
+
+name: Jira worklog to Gmail
+
+on:
+  schedule:
+    - cron: "30 13 * * *"
+  workflow_dispatch:
+
+jobs:
+  worklog-gmail:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install deps
+        run: pip install -r requirements.txt
+
+      - name: Send worklog email
+        env:
+          JIRA_SITE_URL: ${{ secrets.JIRA_SITE_URL }}
+          JIRA_USER_EMAIL: ${{ secrets.JIRA_USER_EMAIL }}
+          JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
+          GMAIL_SMTP_USER: ${{ secrets.GMAIL_SMTP_USER }}
+          GMAIL_SMTP_PASSWORD: ${{ secrets.GMAIL_SMTP_PASSWORD }}
+          WORKLOG_EMAIL_TO: ${{ secrets.WORKLOG_EMAIL_TO }}
+          WORKLOG_EMAIL_SUBJECT: ${{ secrets.WORKLOG_EMAIL_SUBJECT }}
+          REQUEST_VERIFY_SSL: ${{ secrets.REQUEST_VERIFY_SSL }}
+        run: python3 scripts/send_worklog_to_gmail.py --days 1 -z Asia/Kolkata
