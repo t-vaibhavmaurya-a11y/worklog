@@ -1,0 +1,14 @@
+# Local env (never commit secrets)
+.env
+credentials.env
+*.pem
+
+# Python
+__pycache__/
+*.py[cod]
+.Python
+.venv/
+venv/
+
+# OS
+.DS_Store

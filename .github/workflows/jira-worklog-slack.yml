@@ -1,0 +1,45 @@
+# Daily Jira worklog summary → Slack (Incoming Webhook).
+#
+# Setup (repo Settings → Secrets and variables → Actions):
+#   JIRA_SITE_URL      e.g. https://your-domain.atlassian.net
+#   JIRA_USER_EMAIL    your Atlassian account email
+#   JIRA_API_TOKEN     from https://id.atlassian.com/manage-profile/security/api-tokens
+#   SLACK_WEBHOOK_URL  from Slack app → Incoming Webhooks
+# Optional:
+#   REQUEST_VERIFY_SSL  set to "false" only if your Jira endpoint needs it (not typical on GitHub)
+#
+# Cron is UTC only. Examples:
+#   '0 13 * * *'   → 13:00 UTC daily
+#   '30 3 * * 1-5' → 03:30 UTC Mon–Fri
+# Use https://crontab.guru/ and convert your local time to UTC.
+#
+# Manual run: Actions tab → this workflow → "Run workflow".
+
+name: Jira worklog to Slack
+
+on:
+  schedule:
+    - cron: "30 13 * * *"
+  workflow_dispatch:
+
+jobs:
+  worklog-slack:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install deps
+        run: pip install -r requirements.txt
+
+      - name: Send worklog report
+        env:
+          JIRA_SITE_URL: ${{ secrets.JIRA_SITE_URL }}
+          JIRA_USER_EMAIL: ${{ secrets.JIRA_USER_EMAIL }}
+          JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          REQUEST_VERIFY_SSL: ${{ secrets.REQUEST_VERIFY_SSL }}
+        run: python3 scripts/send_worklog_to_slack.py --days 1 -z Asia/Kolkata

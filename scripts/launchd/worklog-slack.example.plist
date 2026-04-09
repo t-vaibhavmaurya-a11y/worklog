@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Daily Jira worklog → Slack (Incoming Webhook).
+
+  1. Copy to ~/Library/LaunchAgents/com.yourname.worklog-slack.plist
+  2. Edit paths and Hour/Minute (24h clock, local timezone).
+  3. Ensure SLACK_WEBHOOK_URL + JIRA_* live in ~/.cursor/credentials.env
+  4. load:   launchctl load ~/Library/LaunchAgents/com.yourname.worklog-slack.plist
+     unload: launchctl unload ~/Library/LaunchAgents/com.yourname.worklog-slack.plist
+
+  Test once:
+    python3 ~/dev/jira-worklog-slack/scripts/send_worklog_to_slack.py --days 1 -z Asia/Kolkata
+-->
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.yourname.worklog-slack</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/usr/bin/python3</string>
+    <string>/ABS/PATH/TO/jira-worklog-slack/scripts/send_worklog_to_slack.py</string>
+    <string>--days</string>
+    <string>1</string>
+    <string>-z</string>
+    <string>Asia/Kolkata</string>
+  </array>
+  <key>StartCalendarInterval</key>
+  <dict>
+    <key>Hour</key>
+    <integer>18</integer>
+    <key>Minute</key>
+    <integer>30</integer>
+  </dict>
+  <key>StandardOutPath</key>
+  <string>/tmp/worklog-slack.out.log</string>
+  <key>StandardErrorPath</key>
+  <string>/tmp/worklog-slack.err.log</string>
+</dict>
+</plist>
