@@ -261,13 +261,17 @@ def _pick_api_prefix(site_url: str, headers: dict[str, str]) -> str:
     except ImportError as e:
         raise SystemExit("Install requests: pip install requests") from e
 
+    errors: list[str] = []
     for prefix in ("/rest/api/3", "/rest/api/2"):
         url = f"{site_url.rstrip('/')}{prefix}/myself"
         r = requests.get(url, headers=headers, timeout=30, verify=_verify_ssl())
         if r.status_code == 200:
             return prefix
+        snippet = (r.text or "")[:300].replace("\n", " ")
+        errors.append(f"{prefix}/myself -> HTTP {r.status_code}: {snippet}")
     raise SystemExit(
-        "Could not reach Jira /myself on API v3 or v2. Check URL, token, and permissions."
+        "Could not reach Jira /myself on API v3 or v2. Check URL, token, and permissions.\n"
+        + "\n".join(errors)
     )
 
 
